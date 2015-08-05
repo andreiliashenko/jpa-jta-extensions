@@ -15,7 +15,7 @@ import static javax.transaction.Status.STATUS_NO_TRANSACTION;
 
 public class JtaEntityManagerHandler implements InvocationHandler {
 
-    private static final String JTA_JPA_ENTITY_MANAGER_KEY = "jta-gpa-entity-manager";
+    private static final String GLOBAL_JTA_ENTITY_MANAGER_KEY = "global-jta-entity-manager";
 
     private final EntityManagerFactory entityManagerFactory;
     private final TransactionManager transactionManager;
@@ -64,10 +64,10 @@ public class JtaEntityManagerHandler implements InvocationHandler {
 
     protected EntityManager getLocalManager() throws SystemException, RollbackException {
         checkTransaction();
-        EntityManager manager = (EntityManager) registry.getResource(JTA_JPA_ENTITY_MANAGER_KEY);
+        EntityManager manager = (EntityManager) registry.getResource(GLOBAL_JTA_ENTITY_MANAGER_KEY);
         if (manager == null) {
             manager = entityManagerFactory.createEntityManager();
-            registry.putResource(JTA_JPA_ENTITY_MANAGER_KEY, manager);
+            registry.putResource(GLOBAL_JTA_ENTITY_MANAGER_KEY, manager);
             transactionManager.getTransaction()
                     .registerSynchronization(new JtaEntityManagerSynchronization(manager));
         }

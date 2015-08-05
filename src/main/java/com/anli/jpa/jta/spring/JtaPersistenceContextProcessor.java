@@ -1,16 +1,11 @@
-package com.anli.jpa.jta.injection;
+package com.anli.jpa.jta.spring;
 
-import com.anli.jpa.jta.entitymanager.JtaEntityManagerHandler;
+import com.anli.jpa.jta.entitymanager.JtaEntityManagerProxyFactory;
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
 import javax.inject.Inject;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.ReflectionUtils;
@@ -25,17 +20,7 @@ public class JtaPersistenceContextProcessor implements BeanPostProcessor {
 
     @Inject
     public JtaPersistenceContextProcessor(EntityManagerFactory factory) {
-        TransactionManager transactionManager;
-        TransactionSynchronizationRegistry registry;
-        try {
-            transactionManager = InitialContext.doLookup("java:/TransactionManager");
-            registry = InitialContext.doLookup("java:comp/TransactionSynchronizationRegistry");
-        } catch (NamingException ex) {
-            throw new RuntimeException(ex);
-        }
-        this.proxy = (EntityManager) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class[]{EntityManager.class},
-                new JtaEntityManagerHandler(factory, transactionManager, registry));
+        this.proxy = JtaEntityManagerProxyFactory.getEntityManagerProxy(factory);
         this.entityManagerFieldFilter = new EntityManagerFieldFilter();
     }
 
