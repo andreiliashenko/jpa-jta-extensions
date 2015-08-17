@@ -25,7 +25,7 @@ public class JtaPersistenceContextTypeListener implements TypeListener {
 
     @Override
     public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
-        doWithFields(type.getClass(), new EntityManagerInjectionCreator(encounter),
+        doWithFields(type.getRawType(), new EntityManagerInjectionCreator(encounter),
                 entityManagerFieldFilter);
     }
 
